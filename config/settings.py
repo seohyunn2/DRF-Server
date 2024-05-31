@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure-o-c+ymhwogu@*c)527p(%7cne9@&==#ut9sw0=8$zou)el)@*&
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'http://127.0.0.1:8000'
+    'http://127.0.0.1:8000',
     '127.0.0.1',
 ]
 # CORS 설정
@@ -75,7 +75,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleWare',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,7 +104,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
