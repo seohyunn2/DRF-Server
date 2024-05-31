@@ -6,22 +6,23 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import serializers
 
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins, viewsets
 from .models import Post
 from .serializers import PostSerializer
 
 
-class PostListCreateAPIView(mixins.ListModelMixin,
-                            mixins.CreateModelMixin,
-                            generics.GenericAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+# # mixin 이용
+# class PostListCreateAPIView(mixins.ListModelMixin,
+#                             mixins.CreateModelMixin,
+#                             generics.GenericAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
     
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
     
 # class PostListCreateAPIView(APIView):
 
@@ -37,21 +38,22 @@ class PostListCreateAPIView(mixins.ListModelMixin,
     #         return Response(serializer.data, status=status.HTTP_201_CREATED)
     #     return Response(serializer.errors, status=status.BAD_REQUEST)
 
-class PostRetrieveUpdateDestroyAPIView(mixins.RetrieveModelMixin, 
-                                       mixins.UpdateModelMixin, 
-                                       mixins.DestroyModelMixin, 
-                                       generics.GenericAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+# # mixin 이용
+# class PostRetrieveUpdateDestroyAPIView(mixins.RetrieveModelMixin, 
+#                                        mixins.UpdateModelMixin, 
+#                                        mixins.DestroyModelMixin, 
+#                                        generics.GenericAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)
     
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+#     def delete(self, request, *args, **kwargs):
+#         return self.destroy(request, *args, **kwargs)
 
 # class PostRetrieveUpdateDestroyAPIView(APIView):
 #     def get_object(selgf, pk):
@@ -78,3 +80,55 @@ class PostRetrieveUpdateDestroyAPIView(mixins.RetrieveModelMixin,
 #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# # CRUD 구현하기
+# # 이미 다 구현이 되어 있음 -> 그냥 갖다 쓰면 됨
+# class PostCreateAPIView(generics.CreateAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# class PostListAPIView(generics.ListAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# class PostRetrieveAPIView(generics.RetrieveAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# class PostUpdateAPIView(generics.UpdateAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# class PostDestroyAPIView(generics.DestroyAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# # lookup field 필요 없음 
+# class PostListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+# # lookup field 필요
+# class PostRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Post.objects.all()
+#     serializer_class = PostSerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def list(self, request, *args, **kwargs):
+        order = request.query_params.get('order')
+        if order == 'user':
+            queryset = self.filter_queryset(self.get_queryset().order_by('user__email'))
+        elif order == 'updated':
+            queryset = self.filter_queryset(self.get_queryset().order_by('-updated_at'))
+        else:
+            queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
