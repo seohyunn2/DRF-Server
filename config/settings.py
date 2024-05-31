@@ -39,13 +39,13 @@ ALLOWED_HOSTS = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
-    'port-0-drf-server-ss7z32llwum4kin.sel5.cloudtype.app',
+    'http://port-0-drf-server-ss7z32llwum4kin.sel5.cloudtype.app',
 ]
 # CSRF 설정
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:8000",
-    'port-0-drf-server-ss7z32llwum4kin.sel5.cloudtype.app',
+    'http://port-0-drf-server-ss7z32llwum4kin.sel5.cloudtype.app',
 ]
 
 # Application definition
